@@ -1,23 +1,46 @@
-stage("Unit test") {
-     steps {
-          dir("Chapter08/sample1") {
-               sh "./gradlew test"
-          }
-     }
-}
+pipeline {
+     agent any
 
-stage("Code coverage") {
-     steps {
-          dir("Chapter08/sample1") {
-               sh "./gradlew clean test jacocoTestReport jacocoTestCoverageVerification"
+     stages {
+          stage("Unit test") {
+               steps {
+                    dir("Chapter08/sample1") {
+                         sh "./gradlew test"
+                    }
+               }
           }
-     }
-}
 
-stage("Static code analysis") {
-     steps {
-          dir("Chapter08/sample1") {
-               sh "./gradlew checkstyleMain"
+          stage("Code coverage") {
+               steps {
+                    dir("Chapter08/sample1") {
+                         sh "./gradlew clean test jacocoTestReport jacocoTestCoverageVerification"
+                    }
+               }
+          }
+
+          stage("Static code analysis") {
+               steps {
+                    dir("Chapter08/sample1") {
+                         sh "./gradlew checkstyleMain"
+                    }
+               }
+          }
+
+          stage("jacoco checkstyle") {
+               steps {
+                    dir("Chapter08/sample1") {
+                         sh "./gradlew checkstyleTest"
+                    }
+               }
+               post {
+                    always {
+                         publishHTML(target: [
+                              reportDir: "Chapter08/sample1/build/reports/checkstyle",
+                              reportFiles: "test.html",
+                              reportName: "jacoco checkstyle"
+                         ])
+                    }
+               }
           }
      }
 }
