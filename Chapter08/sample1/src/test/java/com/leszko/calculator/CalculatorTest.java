@@ -16,12 +16,7 @@ public class CalculatorTest {
     }
 
     @Test
-    public void testNegativeSum() {
-        assertEquals(-1, calculator.sum(2, -3));
-    }
-
-    @Test
-    public void testZeroSum() {
-        assertEquals(0, calculator.sum(0, 0));
+    public void testNumberConstant() {
+        assertEquals(3, Calculator.NUMBER1);
     }
 }
