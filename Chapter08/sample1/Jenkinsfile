@@ -1,53 +1,23 @@
-pipeline {
-     agent any
-     triggers {
-          pollSCM('* * * * *')
+stage("Unit test") {
+     steps {
+          dir("Chapter08/sample1") {
+               sh "./gradlew test"
+          }
      }
-     stages {
-          stage("Compile") {
-               steps {
-                    dir("Chapter08/sample1") {
-                         sh "./gradlew compileJava"
-                    }
-               }
+}
+
+stage("Code coverage") {
+     steps {
+          dir("Chapter08/sample1") {
+               sh "./gradlew clean test jacocoTestReport jacocoTestCoverageVerification"
           }
-          stage("Unit test") {
-               steps {
-                    dir("Chapter08/sample1") {
-                         sh "./gradlew test"
-                    }
-               }
-          }
-          stage("Code coverage") {
-               steps {
-                    dir("Chapter08/sample1") {
-                         sh "./gradlew jacocoTestReport"
-                         sh "./gradlew jacocoTestCoverageVerification"
-                    }
-               }
-          }
-          stage("Static code analysis") {
-               steps {
-                    dir("Chapter08/sample1") {
-                         sh "./gradlew checkstyleMain"
-                    }
-               }
-          }
-          stage("jacoco checkstyle") {
-               steps {
-                    dir("Chapter08/sample1") {
-                         sh "./gradlew checkstyleTest"
-                    }
-               }
-               post {
-                    always {
-                         publishHTML(target: [
-                              reportDir: "Chapter08/sample1/build/reports/checkstyle",
-                              reportFiles: "test.html",
-                              reportName: "jacoco checkstyle"
-                         ])
-                    }
-               }
+     }
+}
+
+stage("Static code analysis") {
+     steps {
+          dir("Chapter08/sample1") {
+               sh "./gradlew checkstyleMain"
           }
      }
 }
