@@ -1,65 +1,24 @@
 pipeline {
     agent any
 
+    environment {
+        GRADLE_USER_HOME = "${WORKSPACE}/.gradle"
+    }
+
     stages {
-
-        stage('Check Branch') {
+        stage('Gradle Build With Cache') {
             steps {
-                echo "Current branch: ${env.BRANCH_NAME}"
-            }
-        }
-
-        stage('Build') {
-            when {
-                anyOf {
-                    branch 'master'
-                    expression {
-                        env.BRANCH_NAME.contains('feature')
-                    }
+                dir('Chapter08/sample1') {
+                    sh './gradlew clean build --build-cache'
                 }
             }
-            steps {
-                echo 'Running Build'
-            }
         }
+    }
 
-        stage('Test') {
-            when {
-                anyOf {
-                    branch 'master'
-                    expression {
-                        env.BRANCH_NAME.contains('feature')
-                    }
-                }
-            }
-            steps {
-                echo 'Running Tests'
-            }
-        }
-
-        stage('CodeCoverage') {
-            when {
-                branch 'master'
-            }
-            steps {
-                echo 'Running Code Coverage'
-            }
-        }
-
-        stage('Invalid Branch') {
-            when {
-                not {
-                    anyOf {
-                        branch 'master'
-                        expression {
-                            env.BRANCH_NAME.contains('feature')
-                        }
-                    }
-                }
-            }
-            steps {
-                error("Invalid branch. Only master and feature branches are allowed.")
-            }
+    post {
+        always {
+            echo 'Checking Gradle cache size'
+            sh 'du -sh .gradle || true'
         }
     }
 }
